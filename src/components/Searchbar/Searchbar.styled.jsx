@@ -1,5 +1,4 @@
 import styled from "@emotion/styled"
-import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 
 const SearchBar = styled.header`
 top: 0;
@@ -29,40 +28,22 @@ const SearchForm = styled.form `display: flex;
   
 
 
-class Question extends React.Component {
-  render() {
-    return <h3> Lets go for a <FaBeer />? </h3>
-  }
-}
   
 const Button = styled.button`
-display: inline-block;
+    display: inline-block;
   width: 48px;
   height: 48px;
-  border: 0;
-  background-image: url('https://image.flaticon.com/icons/svg/149/149852.svg');
-  background-size: 40%;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.6;
+  border: 0; 
+  background-color: #fff;  
+  opacity: 0.3;
   transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   outline: none;
   
   &:hover {
-  opacity: 1;
+  opacity: 0.6;
+  
 }`
-
-const Label = styled.span`
-position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  clip-path: inset(50%);
-  border: 0;`
 
 const Input = styled.input`display: inline-block;
   width: 100%;
@@ -72,6 +53,8 @@ const Input = styled.input`display: inline-block;
   outline: none;
   padding-left: 4px;
   padding-right: 4px;
+  background-color: #fff;  
+  color: #000;
   
   &:placeholder {
   font: inherit;
@@ -79,4 +62,4 @@ const Input = styled.input`display: inline-block;
 }`
 
 
-export {SearchBar, SearchForm, Label, Button, Input}
+export {SearchBar, SearchForm, Button, Input}

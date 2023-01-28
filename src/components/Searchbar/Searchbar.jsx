@@ -1,12 +1,13 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import { SearchBar, SearchForm, Label, Button, Input } from "./Searchbar.styled";
+import { SearchBar, SearchForm,  Button, Input } from "./Searchbar.styled";
+import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 
 export const Searchbar = ({ onSubmit }) => (
     <SearchBar>
    <SearchForm >
     <Button type="submit">
-      <Label>Search</Label>
+     <FaSearch size='1.5em' fill="navy"/>
     </Button>
 
     <Input
