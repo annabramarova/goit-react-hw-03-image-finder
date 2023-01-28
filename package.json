@@ -5,6 +5,7 @@
   "homepage": "https://annabramarova.github.io/goit-react-hw-03-image-finder/",
   "dependencies": {
     "@emotion/styled": "^11.10.5",
+    "@react-icons/all-files": "^4.1.0",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
     "@testing-library/user-event": "^13.5.0",
