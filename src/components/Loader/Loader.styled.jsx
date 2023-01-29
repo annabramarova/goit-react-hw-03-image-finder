@@ -58,7 +58,7 @@ position: absolute;
     border-style: solid;
     animation: ${animate} 3s linear infinite;
     
-    &:nth-child(1) {
+    &:nth-of-type(1) {
     width: 100%;
     height: 100%;
     color: #0064ff;
@@ -68,7 +68,7 @@ position: absolute;
     animation-direction: normal;
 }
 
-    &:nth-child(2) {
+    &:nth-of-type(2) {
     width: 70%;
     height: 70%;
     color: gold;

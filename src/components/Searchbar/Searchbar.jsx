@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { SearchBar, SearchForm,  Button, Input } from "./Searchbar.styled";
 import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 
-export const Searchbar = ({ onSubmit }) => (
+export const Searchbar = ({ onSubmit}) => (
     <SearchBar>
    <SearchForm onSubmit={onSubmit}>
     <Button type="submit">
@@ -11,7 +11,7 @@ export const Searchbar = ({ onSubmit }) => (
     </Button>
 
       <Input
-      name="galleryInput"
+      name="searchQuery"
       type="text"
       autoComplete="off"
       autoFocus
@@ -22,5 +22,5 @@ export const Searchbar = ({ onSubmit }) => (
 )
 
 Searchbar.propTypes = {
-    onSubmit: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
 }

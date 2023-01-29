@@ -1,84 +1,71 @@
-import { Component, Fragment } from "react";
+import { Component } from "react";
+import { Notify } from "notiflix";
 import { Searchbar } from "./Searchbar/Searchbar";
-import { fetchImages } from './api/fetchImages'
+import { fetchImages } from './api/fetchImages';
 import { ImageGallery } from "./ImageGallery/ImageGallery";
-import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn'
-import { Modal } from "./Modal/Modal";
+import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
+import { Error } from './Error/Error';
 import { Spinner } from "./Loader/Loader";
 
 
 export class App extends Component {
   state = {
-  images: [],
-    isLoading: false,
-    query: '',
-    page: 1,
-    modalOpen: false,
-    modalImg: '',
-    modalAlt: '',
+    images: [],
+    query: null,
+    page: null,
+    error: null,
+    status: 'init',
   }
 
-  async componentDidMount() {
-    window.addEventListener('keydown', this.onEscPress);
+   componentDidUpdate(_, prevState) {
+    if (
+      prevState.search === this.state.search ||
+      prevState.page === this.state.page
+    ) {
+     return;
+    }
   }
 
-  async componentDidUpdate(_, prevState) {
-    if (prevState.page !== this.state.page || prevState.query !== this.state.query) {
-      const res = await fetchImages(
-        this.state.query, this.state.page + 1);
+
+  handleSubmit = async e => {
+    e.preventDefault();
+  
+    try {
+      this.setState({ status: 'loading' });
+      const searchQuery = e.target.elements.searchQuery;
+      const response = await fetchImages(searchQuery.value, 1);
+      
+      if (response.length === 0) {
+        return Notify.info(
+          'Sorry, there are no images matching your search query. Please try again.',
+          { position: 'center-center', fontSize: '16px' }        
+        );
+      }
       this.setState({
-        images: [...this.state.images, ...res],
-        page: this.state.page + 1,
-      })
+        images: response,
+        query: searchQuery.value,
+        page: 1,
+      });
+      
+    } catch (error) {
+      this.setState({ status: 'error' })
+    } finally {
+      this.setState({ status: 'done' })
     }
   }
   
-
-  handleSubmit = async event => {
-    event.preventDefault();
-    this.setState({ isLoading: true });
-    const { galleryInput }  = event.target.elements;
-    if (galleryInput.value.trim() === '') {
-      return;
-    }
-    const response = await fetchImages(galleryInput.value, 1);
+  handleLoadMore = async () => {    
+    const { page , query } = this.state;
+    const response = await fetchImages(query, page + 1);
     this.setState({
-      images: response,
-      isLoading: false,
-      query: galleryInput.value,
-      page: 1,
-    })
-  }
-
-  handleImgClick = e => {
-    this.setState({
-      modalOpen: true,
-      modalAlt: e.target.alt,
-      modalImg: e.target.name,
+      images: [...this.state.images, ...response],
+      page: page + 1,
     });
-  }
-
-  handleLoadMore = async () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  }
-
-   handleModalClose = () => {
-    this.setState({
-      modalOpen: false,
-      modalImg: '',
-      modalAlt: '',
-    });
-  };
-
-  onEscPress = e => {
-    if (e.code === 'Escape') {
-      this.handleModalClose();
-    }
   }
 
   render() {
+    const { images, error, status } = this.state;
+
     return (
       <div
         style={{
@@ -88,15 +75,12 @@ export class App extends Component {
           paddingBottom: '24px',
         }}
       >
-        {this.state.isLoading ? (<Spinner />) : (<Fragment>
-          <Searchbar onSubmit={this.handleSubmit} />
-          <ImageGallery onImageClick={this.handleImgClick} images={this.state.images} />
-          {this.state.images.length > 0 ? (
-            <div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>
-            ) : null}
-        </Fragment>)}
-        {this.state.modalOpen ? (
-          <Modal src={this.state.modalImg} alt={this.state.modalAlt} onModalClose={this.handleModalClose} />) : null}
+        <Searchbar onSubmit={this.handleSubmit} />
+        <ImageGallery images={images} />
+        {status === 'error' && <Error message={error} />}
+        {status === 'loading' && <Spinner />}
+        {Boolean(images.length) && status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
+        
       </div>
     );
   }

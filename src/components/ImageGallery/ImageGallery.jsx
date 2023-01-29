@@ -3,19 +3,21 @@ import PropTypes from 'prop-types';
 import { Gallery } from './ImageGallery.styled';
 import {ImgGalleryItem} from 'components/ImageGalleryItem/ImgGalleryItem'
 
-export const ImageGallery = ({ images, onImageClick }) => (
+export const ImageGallery = ({ images }) => (
     <Gallery>
-        {images.map((image, idx) => (
-            <ImgGalleryItem onImageClick ={onImageClick} image={image} key={idx} />
+        {images.map(({id, ...imgData}) => (
+            <ImgGalleryItem imgData={imgData} key={id} />
         ))}
     </Gallery>
 )
 
+ImageGallery.defaultProps = {
+  images: [],
+};
+
+
 ImageGallery.propTypes = {
     images: PropTypes.arrayOf(
-        PropTypes.exact({
-           id: PropTypes.number.isRequired, 
-        })
-    ),
-    onImageClick: PropTypes.func.isRequired,
+    PropTypes.shape({ id: PropTypes.number.isRequired })
+  ).isRequired,
 }
