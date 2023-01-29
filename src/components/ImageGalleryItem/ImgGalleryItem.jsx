@@ -4,7 +4,7 @@ import { Item, Img } from './ImgGalleryItem.styled'
 
 export const ImgGalleryItem = ({ image, onClick }) => (
     <Item id={image.id} onClick={onClick}>
-    <Img src={image.webformatURL}alt={image.tags} name={image.largeImageURL}/>
+    <Img src={image.webformatURL} alt={image.tags} name={image.largeImageURL}/>
     </Item>
 )
 

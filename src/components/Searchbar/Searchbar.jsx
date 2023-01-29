@@ -5,12 +5,13 @@ import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 
 export const Searchbar = ({ onSubmit }) => (
     <SearchBar>
-   <SearchForm >
+   <SearchForm onSubmit={onSubmit}>
     <Button type="submit">
      <FaSearch size='1.5em' fill="navy"/>
     </Button>
 
-    <Input
+      <Input
+      name="galleryInput"
       type="text"
       autoComplete="off"
       autoFocus

@@ -1,11 +1,10 @@
-
 import { Component } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
+import { fetchImages } from './api/fetchImages'
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn'
-import { fetchImages } from './api/fetchImages'
 import { Modal } from "./Modal/Modal";
-// import { FaSearch } from "react-icons/fa/FaSearch";
+import { Spinner } from "./Loader/Loader";
 
 
 export class App extends Component {
@@ -22,15 +21,15 @@ export class App extends Component {
   handleSubmit = async event => {
     event.preventDefault();
     this.setState({ isLoading: true });
-    const { input } = event.target.elements;
-    if (input.value.trim() === '') {
+    const { galleryInput }  = event.target.elements;
+    if (galleryInput.value.trim() === '') {
       return;
     }
-    const response = await fetchImages(input.value, 1);
+    const response = await fetchImages(galleryInput.value, 1);
     this.setState({
       images: response,
       isLoading: false,
-      query: input.value,
+      query: galleryInput.value,
       page: 1,
     })
 
@@ -61,6 +60,16 @@ export class App extends Component {
     });
   };
 
+  onEscPress = e => {
+    if (e.code === 'Escape') {
+      this.handleModalClose();
+    }
+  }
+
+  async componentDidMount() {
+    window.addEventListener('keydown', this.onEscPress);
+  }
+
 
   render() {
     return (
@@ -68,17 +77,15 @@ export class App extends Component {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr',
-          gap: '20px',
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingBottom: '20px',
+          gridGap: '18px',
+          paddingBottom: '24px',
         }}
       >
-        {this.state.isLoading ? (<p>Идет загрузка</p>) : (<>
+        {this.state.isLoading ? (<Spinner />) : (<>
           <Searchbar onSubmit={this.handleSubmit} />
           <ImageGallery onImageClick={this.handleImgClick} images={this.state.images} />
-            {this.state.images.length > 0 ? (
-              <LoadMoreBtn onClick={this.handleLoadMore}  />
+          {this.state.images.length > 0 ? (
+            <div style={{ alignItems: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>
             ) : null}
         </>)}
         {this.state.modalOpen ? (
