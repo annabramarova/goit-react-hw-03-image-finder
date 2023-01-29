@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { Component, Fragment } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { fetchImages } from './api/fetchImages'
 import { ImageGallery } from "./ImageGallery/ImageGallery";
@@ -18,6 +18,22 @@ export class App extends Component {
     modalAlt: '',
   }
 
+  async componentDidMount() {
+    window.addEventListener('keydown', this.onEscPress);
+  }
+
+  async componentDidUpdate(_, prevState) {
+    if (prevState.page !== this.state.page || prevState.query !== this.state.query) {
+      const res = await fetchImages(
+        this.state.query, this.state.page + 1);
+      this.setState({
+        images: [...this.state.images, ...res],
+        page: this.state.page + 1,
+      })
+    }
+  }
+  
+
   handleSubmit = async event => {
     event.preventDefault();
     this.setState({ isLoading: true });
@@ -32,24 +48,20 @@ export class App extends Component {
       query: galleryInput.value,
       page: 1,
     })
-
-
   }
+
   handleImgClick = e => {
     this.setState({
       modalOpen: true,
       modalAlt: e.target.alt,
       modalImg: e.target.name,
-    })
+    });
   }
 
   handleLoadMore = async () => {
-    const res = await fetchImages(
-      this.state.query, this.state.page + 1);
-    this.setState({
-      images: [...this.state.images, ...res],
-      page: this.state.page+1,
-    })
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
   }
 
    handleModalClose = () => {
@@ -66,11 +78,6 @@ export class App extends Component {
     }
   }
 
-  async componentDidMount() {
-    window.addEventListener('keydown', this.onEscPress);
-  }
-
-
   render() {
     return (
       <div
@@ -81,13 +88,13 @@ export class App extends Component {
           paddingBottom: '24px',
         }}
       >
-        {this.state.isLoading ? (<Spinner />) : (<>
+        {this.state.isLoading ? (<Spinner />) : (<Fragment>
           <Searchbar onSubmit={this.handleSubmit} />
           <ImageGallery onImageClick={this.handleImgClick} images={this.state.images} />
           {this.state.images.length > 0 ? (
-            <div style={{ alignItems: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>
+            <div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>
             ) : null}
-        </>)}
+        </Fragment>)}
         {this.state.modalOpen ? (
           <Modal src={this.state.modalImg} alt={this.state.modalAlt} onModalClose={this.handleModalClose} />) : null}
       </div>

@@ -6,7 +6,7 @@ import {ImgGalleryItem} from 'components/ImageGalleryItem/ImgGalleryItem'
 export const ImageGallery = ({ images, onImageClick }) => (
     <Gallery>
         {images.map((image, idx) => (
-            <ImgGalleryItem onClick ={onImageClick} image={image} key={idx} />
+            <ImgGalleryItem onImageClick ={onImageClick} image={image} key={idx} />
         ))}
     </Gallery>
 )
