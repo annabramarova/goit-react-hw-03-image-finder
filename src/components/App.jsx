@@ -14,8 +14,7 @@ export class App extends Component {
     query: '',
     page: 1,
     error: null,
-    status: 'init',
-    allLoaded: false,
+    status: 'init'
   }
 
   componentDidUpdate(_, prevState) {
