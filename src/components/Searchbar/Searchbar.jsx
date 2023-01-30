@@ -1,5 +1,4 @@
 import { Component } from "react";
-import { Notify } from "notiflix";
 import PropTypes from 'prop-types';
 import { SearchBar, SearchForm,  Button, Input } from "./Searchbar.styled";
 import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
@@ -8,25 +7,19 @@ import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
 class Searchbar extends Component {
   state = { search: '' };
 
-  handleChange = e => {
-    this.setState({ search: e.currentTarget.value });
+  handleChange = ({ target }) => {
+    const { name, value } = target;
+    this.setState({ [name]: value.toLowerCase() });
   };
 
   handleSubmit = e => {
     e.preventDefault();
-     if (this.state.search.trim() === '') {
-      return Notify.info('Please enter a search query.', {
-        fontSize: '17px',
-        position: 'center-center',
-      });
+    if (this.state.search.trim() === '') {
+      return;
     }
     this.props.onSubmit({ ...this.state });
-    this.reset();
   };
 
-  reset() {
-    this.setState({ search: '' });
-  }
   render() {
     return (<SearchBar>
       <SearchForm onSubmit={this.handleSubmit}>

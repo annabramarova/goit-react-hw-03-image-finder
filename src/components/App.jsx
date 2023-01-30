@@ -1,7 +1,7 @@
 import { Component } from "react";
-import { Notify } from "notiflix";
+
 import  Searchbar  from "./Searchbar/Searchbar";
-import { fetchImages } from './api/fetchImages';
+import { fetchImages } from '../api/fetchImages';
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
 import { Error } from './Error/Error';
@@ -19,30 +19,21 @@ export class App extends Component {
 
   componentDidUpdate(_, prevState) {
     const { query, page, images } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
+    if (prevState.page !== page || prevState.query !== query) {
       this.setState({ status: 'loading' });
       fetchImages(query, page)
-        .then(({ hasMoreImages, images: newImages, nohits}) => {
-          if (nohits) {
-          this.setState({ status: 'allLoaded' })
-          return Notify.info(
-          'Sorry, there are no images matching your search query. Please try again.',
-        );
-      }
-            this.setState(({
+        .then(({ hasMoreImages, images: newImages }) => {
+          this.setState(({
             status: hasMoreImages ? 'done' : 'allLoaded',
             images: [...images, ...newImages],
           }));
         })
         .catch(error => this.setState({ status: 'error', error: error.message }));
     }
-  }
+  }  
   
 
   handleSubmit = query => {
-    if (!query || query === this.state.query) {
-      return;
-    }
     this.setState({ query: query.search, page: 1, images: [] });
   };
 
@@ -52,7 +43,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, error, status} = this.state;
+    const { images, error, status, query} = this.state;
 
     return (
       <div
@@ -67,7 +58,8 @@ export class App extends Component {
         <ImageGallery images={images} />
         {status === 'error' && <Error message={error} />}
         {status === 'loading' && <Spinner />}
-        {status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
+        {(!images.length && query) && <p style={{ margin: '0 auto', fontSize: '28px', fontWeight: '600', color: '#D0342C'}}>Nothing found</p>}
+        {Boolean(images.length >0) && status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
         
       </div>
     );
