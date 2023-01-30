@@ -1,4 +1,5 @@
-import {Component} from "react";
+import { Component } from "react";
+import { Notify } from "notiflix";
 import PropTypes from 'prop-types';
 import { SearchBar, SearchForm,  Button, Input } from "./Searchbar.styled";
 import { FaSearch } from "@react-icons/all-files/fa/FaSearch";
@@ -13,6 +14,12 @@ class Searchbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+     if (this.state.search.trim() === '') {
+      return Notify.info('Please enter a search query.', {
+        fontSize: '17px',
+        position: 'center-center',
+      });
+    }
     this.props.onSubmit({ ...this.state });
     this.reset();
   };

@@ -15,6 +15,7 @@ export class App extends Component {
     page: 1,
     error: null,
     status: 'init',
+    allLoaded: false,
   }
 
   componentDidUpdate(_, prevState) {
@@ -22,22 +23,27 @@ export class App extends Component {
     if (prevState.query !== query || prevState.page !== page) {
       this.setState({ status: 'loading' });
       fetchImages(query, page)
-        .then(response => {
-          if (response.length === 0) {
-        return Notify.info(
-          'Sorry, there are no images matching your search query. Please try again.');
+        .then(({ hasMoreImages, images: newImages, nohits}) => {
+          if (nohits) {
+          this.setState({ status: 'allLoaded' })
+          return Notify.info(
+          'Sorry, there are no images matching your search query. Please try again.',
+        );
       }
-          this.setState(({
-            images: [...images, ...response],
+            this.setState(({
+            status: hasMoreImages ? 'done' : 'allLoaded',
+            images: [...images, ...newImages],
           }));
         })
-        .catch(() => this.setState({ status: 'error' }))
-        .finally(() => this.setState({ status: 'done' }));
+        .catch(error => this.setState({ status: 'error', error: error.message }));
     }
   }
   
 
   handleSubmit = query => {
+    if (!query || query === this.state.query) {
+      return;
+    }
     this.setState({ query: query.search, page: 1, images: [] });
   };
 
@@ -47,7 +53,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, error, status } = this.state;
+    const { images, error, status} = this.state;
 
     return (
       <div
@@ -62,7 +68,7 @@ export class App extends Component {
         <ImageGallery images={images} />
         {status === 'error' && <Error message={error} />}
         {status === 'loading' && <Spinner />}
-        {Boolean(images.length) && status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
+        {status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
         
       </div>
     );

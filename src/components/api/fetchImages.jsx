@@ -7,12 +7,18 @@ const IMG_PER_PAGE = 12;
 export const fetchImages = async (value, page) => {
     const response = await axios.get(
         `?q=${value}&page=${page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=${IMG_PER_PAGE}`);
-    return response.data.hits.map(image => {
-        return {
-            id: image.id,
-            webformatURL: image.webformatURL,
-            largeImageURL: image.largeImageURL,
-            tags: image.tags,
-        };
-    });
+    
+    const { totalHits, hits } = response.data;
+    const totalPages = Math.ceil(totalHits / IMG_PER_PAGE);
+    
+  return {
+    nohits: totalHits ===0,
+    hasMoreImages: totalPages > page,
+    images: hits.map(image => ({
+      id: image.id,
+      webformatURL: image.webformatURL,
+      largeImageURL: image.largeImageURL,
+      tags: image.tags
+    })),
+  };
 };
