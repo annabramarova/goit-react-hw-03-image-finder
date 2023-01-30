@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { Notify } from "notiflix";
-import { Searchbar } from "./Searchbar/Searchbar";
+import  Searchbar  from "./Searchbar/Searchbar";
 import { fetchImages } from './api/fetchImages';
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { LoadMoreBtn } from './LoadMoreBtn/LoadMoreBtn';
@@ -11,57 +11,40 @@ import { Spinner } from "./Loader/Loader";
 export class App extends Component {
   state = {
     images: [],
-    query: null,
-    page: null,
+    query: '',
+    page: 1,
     error: null,
     status: 'init',
   }
 
-   componentDidUpdate(_, prevState) {
-    if (
-      prevState.search === this.state.search ||
-      prevState.page === this.state.page
-    ) {
-     return;
-    }
-  }
-
-
-  handleSubmit = async e => {
-    e.preventDefault();
-  
-    try {
+  componentDidUpdate(_, prevState) {
+    const { query, page, images } = this.state;
+    if (prevState.query !== query || prevState.page !== page) {
       this.setState({ status: 'loading' });
-      const searchQuery = e.target.elements.searchQuery;
-      const response = await fetchImages(searchQuery.value, 1);
-      
-      if (response.length === 0) {
+      fetchImages(query, page)
+        .then(response => {
+          if (response.length === 0) {
         return Notify.info(
-          'Sorry, there are no images matching your search query. Please try again.',
-          { position: 'center-center', fontSize: '16px' }        
-        );
+          'Sorry, there are no images matching your search query. Please try again.');
       }
-      this.setState({
-        images: response,
-        query: searchQuery.value,
-        page: 1,
-      });
-      
-    } catch (error) {
-      this.setState({ status: 'error' })
-    } finally {
-      this.setState({ status: 'done' })
+          this.setState(({
+            images: [...images, ...response],
+          }));
+        })
+        .catch(() => this.setState({ status: 'error' }))
+        .finally(() => this.setState({ status: 'done' }));
     }
   }
   
-  handleLoadMore = async () => {    
-    const { page , query } = this.state;
-    const response = await fetchImages(query, page + 1);
-    this.setState({
-      images: [...this.state.images, ...response],
-      page: page + 1,
-    });
-  }
+
+  handleSubmit = query => {
+    this.setState({ query: query.search, page: 1, images: [] });
+  };
+
+  
+  handleLoadMore = () => {    
+     this.setState(({ page }) => ({ page: page + 1 }));
+  };
 
   render() {
     const { images, error, status } = this.state;
