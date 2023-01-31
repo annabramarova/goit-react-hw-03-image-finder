@@ -12,6 +12,7 @@ export const fetchImages = async (value, page) => {
     const totalPages = Math.ceil(totalHits / IMG_PER_PAGE);
     
   return {
+    nohits: totalHits ===0,
     hasMoreImages: totalPages > page,
     images: hits.map(image => ({
       id: image.id,

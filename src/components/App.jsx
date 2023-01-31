@@ -1,5 +1,5 @@
 import { Component } from "react";
-
+import { Notify } from "notiflix";
 import  Searchbar  from "./Searchbar/Searchbar";
 import { fetchImages } from '../api/fetchImages';
 import { ImageGallery } from "./ImageGallery/ImageGallery";
@@ -19,10 +19,16 @@ export class App extends Component {
 
   componentDidUpdate(_, prevState) {
     const { query, page, images } = this.state;
-    if (prevState.page !== page || prevState.query !== query) {
+    if (prevState.query !== query || prevState.page !== page) {
       this.setState({ status: 'loading' });
       fetchImages(query, page)
-        .then(({ hasMoreImages, images: newImages }) => {
+        .then(({ hasMoreImages, images: newImages, nohits}) => {
+          if (nohits) {
+            this.setState(({
+              status: 'init'
+            }));
+          return Notify.info('Nothing found');
+        }
           this.setState(({
             status: hasMoreImages ? 'done' : 'allLoaded',
             images: [...images, ...newImages],
@@ -30,11 +36,13 @@ export class App extends Component {
         })
         .catch(error => this.setState({ status: 'error', error: error.message }));
     }
-  }  
+  }
   
 
   handleSubmit = query => {
-    this.setState({ query: query.search, page: 1, images: [] });
+    if (query !== this.state.query) {
+      this.setState({ query: query.search, page: 1, images: [] });
+    }
   };
 
   
@@ -43,7 +51,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, error, status, query} = this.state;
+    const { images, error, status} = this.state;
 
     return (
       <div
@@ -58,7 +66,6 @@ export class App extends Component {
         <ImageGallery images={images} />
         {status === 'error' && <Error message={error} />}
         {status === 'loading' && <Spinner />}
-        {(!images.length && query) && <p style={{ margin: '0 auto', fontSize: '28px', fontWeight: '600', color: '#D0342C'}}>Nothing found</p>}
         {Boolean(images.length >0) && status === 'done' && (<div style={{ textAlign: 'center'}}><LoadMoreBtn onClick={this.handleLoadMore}  /></div>)}
         
       </div>
